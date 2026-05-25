@@ -10,6 +10,8 @@ __pycache__/
 # Test files
 test_llm.py
 test_csv.py
+create_sample_excel.py
+test_excel.py
 
 # Sample files (may contain sensitive data)
 sample_files/
