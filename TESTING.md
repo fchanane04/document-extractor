@@ -38,3 +38,36 @@ python main.py --file sample_files/customers.csv --output result.json
 
 # Switch provider (currently only working with Groq)
 python main.py --file sample_files/invoice.pdf --provider groq
+```
+
+### Expected Data Format
+
+Your files should contain customer data with these columns
+(column names are flexible — the tool auto-detects them):
+
+| Field | Expected Column Names |
+|---|---|
+| Company Name | company_name, company, business, name |
+| Email | email, email_address, billing_email |
+| Country | country, country_code, location |
+| Industry | industry, sector, business_type |
+| Status | status, account_status, state |
+| Join Date | joined_at, created_at, start_date |
+
+### Output Example
+```json
+[
+  {
+    "company_name": "TechCorp Inc",
+    "email": "billing@techcorp.com",
+    "country": "US",
+    "industry": "SaaS",
+    "status": "active",
+    "joined_at": "2024-01-15"
+  }
+]
+```
+
+### Requirements
+- Python 3.10+
+- Groq API key (free at console.groq.com)
