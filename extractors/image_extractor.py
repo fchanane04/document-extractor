@@ -4,21 +4,27 @@ from pathlib import Path
 
 SUPPORTED_FORMATS = [".png", ".jpg", ".jpeg"]
 
-def check_image_quality(text: str, total_chars: int) -> dict:
-    if total_chars == 0:
+def check_image_quality(text: str) -> dict:
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+    total_lines = len(lines)
+    if total_lines == 0:
         return {"quality": "bad", "score": 0}
-    
-    #count how many characters look like garbage
-    garbage_chars = sum(1 for c in text if not c.isalnum() and c not in " @.,\n-_/:")
-    garbage_ratio = garbage_chars / total_chars
-
-    #score quality based on calculated ratio
-    if garbage_ratio > 0.3:
-        return {"quality": "poor", "score": round((1 - garbage_ratio) * 100)}
-    elif garbage_ratio > 0.15:
-        return {"quality": "fair", "score": round((1 - garbage_ratio) * 100)}
+    valid_lines = sum(1 for line in lines if '@' in line or line.count(',') >= 2)
+    if total_lines == 0:
+        score = 0
     else:
-        return {"quality": "good", "score": round((1 - garbage_ratio) * 100)}
+        score = round((valid_lines / total_lines) * 100)
+
+    #counting suspiciously shorter lines
+    short_lines = sum(1 for line in lines if len(line) < 10)
+    short_ratio = short_lines / total_lines if total_lines > 0 else 0
+
+    if short_ratio > 0.4:
+        return {"quality": "poor", "score": score}
+    elif short_ratio > 0.2:
+        return {"quality": "fair", "score": score}
+    else:
+        return {"quality": "good", "score": score}
 
 def extract_text_from_image(file_path: str) -> str:
     path = Path(file_path)
@@ -42,7 +48,7 @@ def extract_text_from_image(file_path: str) -> str:
         raise ValueError("OCR could not extract any text from the image — try anorher image")
 
     #check quality
-    quality = check_image_quality(text, len(text))
+    quality = check_image_quality(text)
 
     if quality["quality"] == "poor":
         print(f"\n WARNING: Image quality is poor (score: {quality['score']}/100)")
